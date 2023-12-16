@@ -1,13 +1,14 @@
-
-
-
-
+"use client"
 import { Todo } from "@/src/lib/drizzle";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const getData = async () => {
+interface ApiResponse {
+  data: Todo[];
+}
+
+const getData = async (baseUrl: string): Promise<ApiResponse> => {
   try {
-    const res = await fetch("http://localhost:3000/api/todo", {
+    const res = await fetch(`${baseUrl}/api/todo`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
@@ -15,20 +16,36 @@ const getData = async () => {
     if (!res.ok) {
       throw new Error("Failed to fetch data");
     }
-    const result = await res.json();
+
+    const result: ApiResponse = await res.json();
     return result;
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    throw error;
   }
 };
 
-const Todolist = async () => {
-  const res: { data: Todo[] } = await getData();
+const Todolist: React.FC = () => {
+  const [data, setData] = useState<ApiResponse>({ data: [] });
 
+  useEffect(() => {
+    const baseUrl = "";
+
+    const fetchData = async () => {
+      try {
+        const result = await getData(baseUrl);
+        setData(result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [data]); 
   return (
     <div className="max-h-[400px] overflow-auto">
-      {res.data.map((item) => {
-        return (
+      {data.data.length > 0 ? (
+        data.data.map((item) => (
           <div
             key={item.id}
             className="bg-gray-200 py-4 px-4 flex shadow rounded-lg items-center  gap-x-3 my-2 mr-2"
@@ -38,8 +55,10 @@ const Todolist = async () => {
               <p className="text-lg font-medium ">{item.task}</p>
             </div>
           </div>
-        );
-      })}
+        ))
+      ) : (
+        <p>No data available</p>
+      )}
     </div>
   );
 };
