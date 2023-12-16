@@ -25,7 +25,7 @@ const Todolist = async () => {
 
   return (
     <div className="max-h-[400px] overflow-auto">
-         {res.data.map((item) => {
+{/*          {res.data.map((item) => {
         return (
           <div
             key={item.id}
@@ -37,7 +37,7 @@ const Todolist = async () => {
             </div>
           </div>
         );
-      })} 
+      })}  */}
     </div>
   );
 };
